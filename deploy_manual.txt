@@ -1,0 +1,14 @@
+TODO:  create writeup for deploying the gateway... here's the short and skinny:
+
+0) there is currently no setup.py; you must manually install the modules listed in requirements.txt
+
+1) review all code, this is open source financial software without warranty; you alone are responsible for your use of this script
+
+2) block_exporers.py will open up 3rd party web based block explorers which can be used to watch transactions
+
+3) run all unit_test scripts.   Also several of the module component scripts contain onboard unit test which can be run via the main().  These should be run prior to depoying the gateway.
+
+3) The gateway has a nodes.py and config.py  be sure to fill these forms out with the pertinent information.
+
+4) Gateway.py is the primary gateway script, running this script will launch the gateway.
+

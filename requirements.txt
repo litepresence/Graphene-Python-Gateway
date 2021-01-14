@@ -1,0 +1,8 @@
+falcon 
+pybitshares 
+eosiopy 
+requests
+websocket-client
+secp256k1
+ecdsa
+aioxrpy
