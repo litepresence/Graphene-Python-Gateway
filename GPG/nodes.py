@@ -22,8 +22,9 @@ SECURITY ADVISORY: best to use a "personal node" in production
 
 def eosio_nodes():
     """
-    EOSIO https rest api endpoints tested MAY 2020
+    EOSIO https rest api endpoints tested MAY 2021
     """
+    # https://validate.eosnation.io/eos/reports/ << node lists
     # alternatively you can use single private node in list
     # if using more than 1 node it is best to use at least 5
     return ["https://api.eosdetroit.io"]
