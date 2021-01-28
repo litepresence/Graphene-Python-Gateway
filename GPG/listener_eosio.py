@@ -40,6 +40,7 @@ triggers:
 from multiprocessing import Process, Manager, Value
 from json import dumps as json_dumps
 from ctypes import c_wchar_p
+from hashlib import sha256
 import traceback
 import time
 
@@ -50,16 +51,13 @@ from requests import post
 from nodes import eosio_nodes
 from config import configure
 from signing_bitshares import issue, reserve
-from gateway_state import unlock_address
 from utilities import it, timestamp, line_number
 
 # GLOBAL CONSTANTS
 GATE = configure()["gate"]
 DEPOSIT_TIMEOUT = 1800
-DEPOSIT_PAUSE = 600
 POST_TIMEOUT = 5
-MAVENS = min(5, len(eosio_nodes()))
-NODE = eosio_nodes()[-1]
+NODE = eosio_nodes()[0]
 DEV = False  # fast forward past irr block and print every transfer
 
 
@@ -115,6 +113,7 @@ def listener_eosio(
     uia = GATE["uia"]["eos"]["asset_name"]
     start_block_num = get_irreversible_block()
     checked_blocks = [start_block_num]
+    tx_hash = sha256(client_id + str(nonce))
     print("Start Block:", start_block_num, "\n")
     # block["transactions"][0]["trx"]["transaction"]["actions"][0] holds:
     #   ["name"] # str("transfer") etc.
@@ -129,9 +128,6 @@ def listener_eosio(
                 gateway,
                 "\n",
             )
-            # 10 minutes after timeout, release the address
-            if issuer_action == "issue":
-                unlock_address("eos", account_idx, DEPOSIT_PAUSE)
             break
         # get the latest irreversible block number
         current_block = get_irreversible_block()
@@ -194,9 +190,10 @@ def listener_eosio(
                                 and action["account"] == "eosio.token"
                             ):
                                 # extract transfer op data
-                                qty = action["data"]["quantity"]
                                 trx_to = action["data"]["to"]
                                 trx_from = action["data"]["from"]
+                                trx_memo = action["data"]["memo"].replace(" ","")
+                                qty = action["data"]["quantity"]
                                 trx_asset = qty.split(" ")[1].upper()
                                 trx_amount = float(qty.split(" ")[0])
                                 # sort again by > nil amount of eos
@@ -210,18 +207,20 @@ def listener_eosio(
                                         timestamp()
                                         line_number()
                                         print(
-                                            f"nonce {nonce}",
+                                            f"nonce {nonce} memo {trx_memo}",
                                             it("red", "GATEWAY TRANSFER DETECTED\n"),
                                             f"amount {trx_amount} {trx_asset}\n",
                                             f"from {trx_from}\n",
                                             f"to {trx_to}\n",
                                         )
-
                                         # issue UIA to client_id
                                         # upon receipt of their foreign funds
                                         if (
                                             issuer_action == "issue"
                                             and trx_to == gateway
+                                            # eos deposits will use one address
+                                            # distinguish between deposits by memo
+                                            and trx_memo == tx_hash
                                         ):
                                             print(
                                                 f"nonce {nonce}",
@@ -232,13 +231,6 @@ def listener_eosio(
                                                 ),
                                             )
                                             issue("eos", trx_amount, client_id)
-                                            # unlock the deposit address after some time
-                                            delay = (
-                                                DEPOSIT_TIMEOUT
-                                                - elapsed
-                                                + DEPOSIT_PAUSE
-                                            )
-                                            unlock_address("eos", account_idx, delay)
                                             return
                                         # when returning foreign funds to client,
                                         # upon receipt, reserve equal in UIA
