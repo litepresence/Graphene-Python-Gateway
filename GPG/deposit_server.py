@@ -30,6 +30,7 @@ from subprocess import call
 from multiprocessing import Process
 from json import dumps as json_dumps
 from wsgiref.simple_server import make_server
+from hashlib import sha256
 
 # THIRD PARTY MODULES
 from falcon import App, HTTP_200
@@ -83,7 +84,10 @@ class GatewayDepositServer:
         print("network", network, "\n")
         if network in ["xrp", "eos"]:
             # lock an address until this transaction is complete
-            gateway_idx = lock_address(network)
+            if network == "eos":
+                gateway_idx = 0
+            else:
+                gateway_idx = lock_address(network)
             print("gateway index", gateway_idx, "\n")
             if gateway_idx is not None:
                 timestamp()
@@ -91,6 +95,13 @@ class GatewayDepositServer:
                 deposit_address = GATE[network][gateway_idx]["public"]
                 print("gateway address", deposit_address, "\n")
                 # format a response json
+                memo_msg = ""
+                tx_hash = sha256(client_id + str(nonce))
+                if network == "eos":
+                    memo_msg = (
+                        "Your deposit transfer must include a the following memo: "
+                        + tx_hash
+                    )
                 msg = json_dumps(
                     {
                         "response": "success",
@@ -103,7 +114,7 @@ class GatewayDepositServer:
                             + "in this response.  Make ONE transfer to this address, "
                             + "within the gateway_timeout specified. Transactions on "
                             + f"this network take about {confirm_time[network]} "
-                            + "minutes to confirm."
+                            + f"minutes to confirm. {memo_msg}"
                         ),
                     }
                 )
