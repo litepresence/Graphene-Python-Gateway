@@ -1,5 +1,5 @@
 falcon 
-pybitshares 
+bitshares
 eosiopy 
 requests
 websocket-client
