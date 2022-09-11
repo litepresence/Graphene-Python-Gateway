@@ -59,10 +59,6 @@ class GatewayDepositServer:
         Server RESPONSE is deposit address and timeout
         After timeout or deposit return address to text pipe list
         """
-        confirm_time = {
-            "eos": 30,
-            "xrp": 2,
-        }
         # create a millesecond nonce to log this event
         nonce = milleseconds()
         # extract the incoming parameters to a dictionary
@@ -81,7 +77,7 @@ class GatewayDepositServer:
         elif uia == GATE["uia"]["eos"]["asset_name"]:
             network = "eos"
         print("network", network, "\n")
-        if network in ["xrp", "eos"]:
+        if network in {"xrp", "eos"}:
             # lock an address until this transaction is complete
             gateway_idx = lock_address(network)
             print("gateway index", gateway_idx, "\n")
@@ -90,6 +86,10 @@ class GatewayDepositServer:
                 line_number()
                 deposit_address = GATE[network][gateway_idx]["public"]
                 print("gateway address", deposit_address, "\n")
+                confirm_time = {
+                    "eos": 30,
+                    "xrp": 2,
+                }
                 # format a response json
                 msg = json_dumps(
                     {
@@ -141,7 +141,7 @@ class GatewayDepositServer:
                 }
             )
         # log the response and build the response body with a data dictionary
-        doc = str(nonce) + "_" + uia + "_" + client_id + ".txt"
+        doc = f"{str(nonce)}_{uia}_{client_id}.txt"
         json_ipc(doc=doc, text=msg)
         time.sleep(5)  # allow some time for listener to start before offering address
         print(msg, "\n")

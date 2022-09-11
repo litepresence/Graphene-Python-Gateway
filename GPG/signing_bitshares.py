@@ -180,8 +180,7 @@ def global_variables():
 
     global info
 
-    info = {}
-    info["id"] = 1  # will be used to increment rpc request id
+    info = {"id": 1}
 
 
 def global_constants():
@@ -296,7 +295,7 @@ def wss_handshake():
 def wss_query(params):
 
     # this definition will place all remote procedure calls (RPC)
-    for i in range(10):
+    for _ in range(10):
         try:
             # print(it('purple','RPC ' + params[0]), it('cyan',params[1]))
             # this is the 4 part format of EVERY rpc request
@@ -324,21 +323,17 @@ def wss_query(params):
             trace(e)  # tell me what happened
             # switch nodes
             wss_handshake()
-            continue
     raise
 
 
 def rpc_block_number():
-    # block number and block prefix
-    ret = wss_query(["database", "get_dynamic_global_properties", []])
-    return ret
+    return wss_query(["database", "get_dynamic_global_properties", []])
 
 
 def rpc_account_id():
     # given an account name return an account id
     ret = wss_query(["database", "lookup_accounts", [account_name, 1]])
-    account_id = ret[0][1]
-    return account_id
+    return ret[0][1]
 
 
 def rpc_fees():
@@ -419,10 +414,7 @@ def rpc_open_orders():
 
 def rpc_key_reference(public_key):
 
-    # given public key return account id
-    ret = wss_query(["database", "get_key_references", [[public_key]]])
-
-    return ret
+    return wss_query(["database", "get_key_references", [[public_key]]])
 
 
 def rpc_get_transaction_hex_without_sig(tx):
@@ -454,15 +446,11 @@ def rpc_broadcast_transaction(tx):
 
 
 def to_iso_date(unix):
-    # returns iso8601 datetime given unix epoch
-    iso = datetime.utcfromtimestamp(int(unix)).isoformat()
-    return iso
+    return datetime.utcfromtimestamp(int(unix)).isoformat()
 
 
 def from_iso_date(iso):
-    # returns unix epoch given iso8601 datetime
-    unix = int(timegm(strptime((iso + "UTC"), ISO8601)))
-    return unix
+    return int(timegm(strptime(f"{iso}UTC", ISO8601)))
 
 
 " GRAPHENEBASE TYPES "  # graphenebase/types.py
@@ -569,7 +557,7 @@ class Array:
 
     def __init__(self, d):
         self.data = d
-        self.length = int(len(self.data))
+        self.length = len(self.data)
 
     def __bytes__(self):
         return bytes(varint(self.length)) + b"".join([bytes(a) for a in self.data])
@@ -636,9 +624,7 @@ class Optional:
     def isempty(self):
         if self.data is None:
             return True
-        if not bool(str(self.data)):  # pragma: no cover
-            return True
-        return not bool(bytes(self.data))
+        return not bool(bytes(self.data)) if bool(str(self.data)) else True
 
 
 class Signature:
@@ -705,9 +691,9 @@ class Base58(object):
         self._prefix = prefix
         if all(c in HEXDIGITS for c in data):
             self._hex = data
-        elif data[0] == "5" or data[0] == "6":
+        elif data[0] in ["5", "6"]:
             self._hex = base58CheckDecode(data)
-        elif data[0] == "K" or data[0] == "L":
+        elif data[0] in ["K", "L"]:
             self._hex = base58CheckDecode(data)[:-2]
         elif data[: len(self._prefix)] == self._prefix:
             self._hex = gphBase58CheckDecode(data[len(self._prefix) :])
@@ -716,11 +702,9 @@ class Base58(object):
 
     def __format__(self, _format):
 
-        if _format.upper() == PREFIX:
-            return _format.upper() + str(self)
-        else:
+        if _format.upper() != PREFIX:
             print("Format %s unkown. You've been warned!\n" % _format)
-            return _format.upper() + str(self)
+        return _format.upper() + str(self)
 
     def __repr__(self):  # hex string of data
         return self._hex
@@ -746,8 +730,7 @@ def base58decode(base58_str):
         div, mod = divmod(n, 256)
         res.insert(0, mod)
         n = div
-    else:
-        res.insert(0, n)
+    res.insert(0, n)
     return hexlify(bytearray(1) * leading_zeroes_count + res).decode("ascii")
 
 
@@ -765,9 +748,8 @@ def base58encode(hexstring):
         div, mod = divmod(n, 58)
         res.insert(0, BASE58[mod])
         n = div
-    else:
-        res.insert(0, BASE58[n])
-    ret = (BASE58[0:1] * leading_zeroes_count + res).decode("ascii")
+    res.insert(0, BASE58[n])
+    ret = (BASE58[:1] * leading_zeroes_count + res).decode("ascii")
 
     # public_key = 'BTS' + str(ret)
     # print(it('purple',public_key), "public key")
@@ -878,8 +860,8 @@ class PublicKey(Address):  # graphenebase/account.py
                 print(public_key)
                 print(len(public_key))
                 account = rpc_key_reference(public_key)
-                print(str(account[0][0]))
-                print(str(account_id))
+                print(account[0][0])
+                print(account_id)
                 if str(account[0][0]) == str(account_id):
                     authenticated = True
                 print("authenticated:", authenticated)
@@ -907,24 +889,21 @@ class PublicKey(Address):  # graphenebase/account.py
             bytes(self), curve=ecdsa_SECP256k1
         ).pubkey.point
         x_str = ecdsa_util.number_to_string(p.x(), order)
-        # y_str = ecdsa_util.number_to_string(p.y(), order)
-        compressed = hexlify(bytes(chr(2 + (p.y() & 1)), "ascii") + x_str).decode(
+        return hexlify(bytes(chr(2 + (p.y() & 1)), "ascii") + x_str).decode(
             "ascii"
         )
-        return compressed
 
     def unCompressed(self):
         print("PublicKey.unCompressed")
         """ Derive uncompressed key """
         public_key = repr(self._pk)
-        prefix = public_key[0:2]
+        prefix = public_key[:2]
         if prefix == "04":
             return public_key
-        assert prefix == "02" or prefix == "03"
+        assert prefix in ["02", "03"]
         x = int(public_key[2:], 16)
         y = self._derive_y_from_x(x, (prefix == "02"))
-        key = "04" + "%064x" % x + "%064x" % y
-        return key
+        return "04" + "%064x" % x + "%064x" % y
 
     def point(self):
         """ Return the point for the public key """
@@ -1018,10 +997,7 @@ class GrapheneObject(object):  # Bitshares(MIT) graphenebase/objects.py
             return bytes()
         b = b""
         for name, value in self.data.items():
-            if isinstance(value, str):
-                b += bytes(value, "utf-8")
-            else:
-                b += bytes(value)
+            b += bytes(value, "utf-8") if isinstance(value, str) else bytes(value)
         return b
 
 
@@ -1030,7 +1006,7 @@ class Asset(GrapheneObject):  # bitsharesbase/objects.py
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -1053,7 +1029,7 @@ class Operation:  # refactored  litepresence2019
 
         if not (isinstance(op, list)):
             raise ValueError("expecting op to be a list")
-        if not (len(op) == 2):
+        if len(op) != 2:
             raise ValueError("expecting op to be two items")
         if not (isinstance(op[0], int)):
             raise ValueError("expecting op[0] to be integer")
@@ -1082,20 +1058,21 @@ class Operation:  # refactored  litepresence2019
 
 class Extension(Array):  # /bitsharesbase/objects.py
     def __init__(self, *args, **kwargs):
-        self.json = dict()
         a = []
-        for key, value in kwargs.items():
-            self.json.update({key: value})
+        self.json = dict(kwargs)
         for arg in args:
             if isinstance(arg, dict):
-                self.json.update(arg)
+                self.json |= arg
 
         for index, extension in enumerate(self.sorted_options):
             name = extension[0]
             klass = extension[1]
-            for key, value in self.json.items():
-                if key.lower() == name.lower():
-                    a.append(Static_variant(klass(value), index))
+            a.extend(
+                Static_variant(klass(value), index)
+                for key, value in self.json.items()
+                if key.lower() == name.lower()
+            )
+
         super().__init__(a)
 
     def __str__(self):
@@ -1127,11 +1104,13 @@ class Signed_Transaction(GrapheneObject):  # merged litepresence2019
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
-            if "extensions" not in kwargs:
-                kwargs["extensions"] = Array([])
-            elif not kwargs.get("extensions"):
+            if (
+                "extensions" not in kwargs
+                or "extensions" in kwargs
+                and not kwargs.get("extensions")
+            ):
                 kwargs["extensions"] = Array([])
             if "signatures" not in kwargs:
                 kwargs["signatures"] = Array([])
@@ -1142,7 +1121,7 @@ class Signed_Transaction(GrapheneObject):  # merged litepresence2019
 
             if "operations" in kwargs:
                 opklass = self.getOperationKlass()
-                if all([not isinstance(a, opklass) for a in kwargs["operations"]]):
+                if all(not isinstance(a, opklass) for a in kwargs["operations"]):
                     kwargs["operations"] = Array(
                         [opklass(a) for a in kwargs["operations"]]
                     )
@@ -1267,7 +1246,7 @@ class Signed_Transaction(GrapheneObject):  # merged litepresence2019
                 f = format(k, PREFIX)  # chain_params["prefix"]) # 'BTS'
                 print("")
                 print(it("red", "FIXME"))
-                raise Exception("Signature for %s missing!" % f)
+                raise Exception(f"Signature for {f} missing!")
 
         return pubKeysFound
 
@@ -1297,7 +1276,7 @@ class Limit_order_create(GrapheneObject):  # bitsharesbase/operations.py
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -1323,7 +1302,7 @@ class Call_order_update(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -1346,11 +1325,8 @@ class CallOrderExtension(Extension):
     /bitsharesbase/objects.py
     """
 
-    def tcr(value):
-        if value:
-            return Uint16(value)
-        else:
-            return None
+    def tcr(self):
+        return Uint16(self) if self else None
 
     sorted_options = [("target_collateral_ratio", tcr)]
 
@@ -1360,7 +1336,7 @@ class Limit_order_cancel(GrapheneObject):  # bitsharesbase/operations.py
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             super().__init__(
                 OrderedDict(
@@ -1383,7 +1359,7 @@ class Transfer(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             prefix = kwargs.get("prefix", PREFIX)
             if "memo" in kwargs and kwargs["memo"]:
@@ -1415,7 +1391,7 @@ class Asset_issue(GrapheneObject):
         else:
             prefix = kwargs.get("prefix", PREFIX)
 
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
             if "memo" in kwargs and kwargs["memo"]:
                 memo = Optional(Memo(prefix=prefix, **kwargs["memo"]))
@@ -1443,7 +1419,7 @@ class Asset_reserve(GrapheneObject):
         if isArgsThisClass(self, args):
             self.data = args[0].data
         else:
-            if len(args) == 1 and len(kwargs) == 0:
+            if len(args) == 1 and not kwargs:
                 kwargs = args[0]
 
             super().__init__(
@@ -1488,16 +1464,11 @@ def verify_message(message, signature, hashfn=sha256):
     normalSig = verifyPub.ecdsa_recoverable_convert(sig)
     # verify
     verifyPub.ecdsa_verify(message, normalSig)
-    phex = verifyPub.serialize(compressed=True)
-
-    return phex
+    return verifyPub.serialize(compressed=True)
 
 
 def isArgsThisClass(self, args):  # graphenebase/objects.py
-    # if there is only one argument and its type name is
-    # the same as the type name of self
-    ret = len(args) == 1 and type(args[0]).__name__ == type(self).__name__
-    return ret
+    return len(args) == 1 and type(args[0]).__name__ == type(self).__name__
 
 
 " PRIMARY TRANSACTION BACKBONE "
