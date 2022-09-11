@@ -28,8 +28,8 @@ from json import dumps as json_dumps
 from multiprocessing import Process
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from utilities import json_ipc
-from config import configure
+from GPG.utilities import json_ipc
+from GPG.config import configure
 
 # GLOBAL CONSTANTS
 GATE = configure()["gate"]

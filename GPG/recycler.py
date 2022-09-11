@@ -21,10 +21,10 @@ ensure all inbound funds are transfered to the zero index outbound account
 import time
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from config import configure
-from signing_eosio import eos_transfer, eos_balance
-from signing_ripple import xrp_transfer, xrp_balance
-from utilities import it, timestamp, line_number
+from GPG.config import configure
+from GPG.signing_eosio import eos_transfer, eos_balance
+from GPG.signing_ripple import xrp_transfer, xrp_balance
+from GPG.utilities import it, timestamp, line_number
 
 # GLOBAL CONSTANTS
 NIL_EOS = 0.1

@@ -35,11 +35,11 @@ from wsgiref.simple_server import make_server
 from falcon import App, HTTP_200
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from listener_eosio import listener_eosio
-from listener_ripple import listener_ripple
-from utilities import it, json_ipc, timestamp, line_number, milleseconds
-from config import configure
-from gateway_state import lock_address
+from GPG.listener_eosio import listener_eosio
+from GPG.listener_ripple import listener_ripple
+from GPG.utilities import it, json_ipc, timestamp, line_number, milleseconds
+from GPG.config import configure
+from GPG.gateway_state import lock_address
 
 # GLOBAL CONSTANTS
 GATE = configure()["gate"]

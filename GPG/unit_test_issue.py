@@ -22,9 +22,9 @@ RESERVE asset
 """
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from signing_bitshares import broker
-from nodes import bitshares_nodes
-from config import configure
+from GPG.signing_bitshares import broker
+from GPG.nodes import bitshares_nodes
+from GPG.config import configure
 
 
 AMOUNT = 1  # must be integer during testing due to precision of test uia

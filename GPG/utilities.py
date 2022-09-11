@@ -33,7 +33,7 @@ from json import loads as json_loads
 from websocket import create_connection as wss
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from nodes import bitshares_nodes
+from GPG.nodes import bitshares_nodes
 
 
 def milleseconds():

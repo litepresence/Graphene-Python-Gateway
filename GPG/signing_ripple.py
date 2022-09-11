@@ -34,8 +34,8 @@ from aioxrpy.keys import RippleKey
 from aioxrpy.rpc import RippleJsonRpc
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from config import configure
-from utilities import it, timestamp, line_number
+from GPG.config import configure
+from GPG.utilities import it, timestamp, line_number
 
 # CONSTANTS
 URL = "https://s1.ripple.com:51234/"

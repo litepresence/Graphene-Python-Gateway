@@ -21,9 +21,9 @@ Get balances and transfer xrp and eos
 import time
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from signing_ripple import xrp_transfer, xrp_balance
-from signing_eosio import eos_transfer, eos_balance
-from config import configure
+from GPG.signing_ripple import xrp_transfer, xrp_balance
+from GPG.signing_eosio import eos_transfer, eos_balance
+from GPG.config import configure
 
 # GLOBAL CONSTANTS
 GATE = configure()["gate"]

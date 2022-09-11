@@ -22,7 +22,7 @@ Open 3rd party block explorers in web browser for all pertinent accounts
 from webbrowser import open as browse
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from config import configure
+from GPG.config import configure
 
 # GLOBAL CONSTANTS
 GATE = configure()["gate"]

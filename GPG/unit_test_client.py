@@ -26,11 +26,11 @@ from pprint import pprint
 from requests import get
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from config import configure
-from utilities import wss_handshake
-from listener_bitshares import rpc_balances, rpc_get_objects
-from signing_ripple import xrp_balance, xrp_transfer
-from signing_eosio import eos_balance, eos_transfer
+from GPG.config import configure
+from GPG.utilities import wss_handshake
+from GPG.listener_bitshares import rpc_balances, rpc_get_objects
+from GPG.signing_ripple import xrp_balance, xrp_transfer
+from GPG.signing_eosio import eos_balance, eos_transfer
 
 
 # GLOBAL CONSTANTS

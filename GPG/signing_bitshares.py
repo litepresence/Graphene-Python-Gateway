@@ -72,8 +72,8 @@ from ecdsa import util as ecdsa_util  # module
 from ecdsa import der as ecdsa_der  # module
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from config import configure
-from nodes import bitshares_nodes
+from GPG.config import configure
+from GPG.nodes import bitshares_nodes
 
 # GLOBAL CONSTANTS
 GATE = configure()["gate"]
