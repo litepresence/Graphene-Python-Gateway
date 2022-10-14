@@ -77,14 +77,14 @@ def json_ipc(doc="", text="", initialize=False):
     msg = "writing"
     tag = "<<< JSON IPC >>>"
     # determine where we are in the file system; change directory to pipe folder
-    path = os.path.dirname(os.path.abspath(__file__)) + "/pipe"
+    path = f"{os.path.dirname(os.path.abspath(__file__))}/pipe"
     # ensure we're writing json then add prescript and postscript for clipping
     text = tag + json_dumps(json_loads(text)) + tag if text else text
     # create the pipe subfolder
     if initialize:
         os.makedirs(path, exist_ok=True)
     if doc:
-        doc = path + "/" + doc
+        doc = f"{path}/{doc}"
         # race read/write until satisfied
         iteration = 0
         while True:
@@ -127,7 +127,7 @@ def line_number():
     prints file name, line number and function of the caller; h/t @ Streamsoup
     """
     stack = inspect.stack()
-    full_stack = str(stack[1][1]) + ":" + str(stack[1][2]) + ":" + str(stack[1][3])
+    full_stack = f"{str(stack[1][1])}:{str(stack[1][2])}:{str(stack[1][3])}"
     print(full_stack)
     return full_stack
 
@@ -196,8 +196,7 @@ def it(style, text):
         "purple": 95,
         "cyan": 96,
     }
-    ret = f"\033[{emphasis[style]}m" + str(text) + "\033[0m"
-    return ret
+    return f"\033[{emphasis[style]}m{str(text)}" + "\033[0m"
 
 
 def raw_operations():

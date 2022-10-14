@@ -54,10 +54,12 @@ def unit_test_issue(network):
         "account_name": TEST["bts"]["public"],
         "wif": TEST["bts"]["private"],
     }
-    order = {"nodes": bitshares_nodes()}
-    # login to accounts
-    order["edicts"] = [{"op": "login"}]
-    order["header"] = test_header
+    order = {
+        "nodes": bitshares_nodes(),
+        "edicts": [{"op": "login"}],
+        "header": test_header,
+    }
+
     print("Log In", order["header"]["account_name"], broker(order), "\n\n")
     order["header"] = gate_header
     print("Log In", order["header"]["account_name"], broker(order), "\n\n")
@@ -97,18 +99,25 @@ def refill_test_account():
     """
     networks = ["xrp", "eos"]
     for network in networks:
-        order = {"nodes": bitshares_nodes()}
-        order["header"] = {
-            "asset_id": GATE["uia"][network]["asset_id"],
-            "asset_precision": GATE["uia"][network]["asset_precision"],
-            # gate account details
-            "account_id": GATE["uia"][network]["issuer_id"],
-            "account_name": GATE["uia"][network]["issuer_public"],
-            "wif": GATE["uia"][network]["issuer_private"],
+        order = {
+            "nodes": bitshares_nodes(),
+            "header": {
+                "asset_id": GATE["uia"][network]["asset_id"],
+                "asset_precision": GATE["uia"][network]["asset_precision"],
+                "account_id": GATE["uia"][network]["issuer_id"],
+                "account_name": GATE["uia"][network]["issuer_public"],
+                "wif": GATE["uia"][network]["issuer_private"],
+            },
+            "edicts": [
+                {
+                    "op": "issue",
+                    "amount": 100,
+                    "account_id": TEST["bts"]["id"],
+                    "memo": "",
+                }
+            ],
         }
-        order["edicts"] = [
-            {"op": "issue", "amount": 100, "account_id": TEST["bts"]["id"], "memo": "",}
-        ]
+
         print({k: v for k, v in order["header"].items() if k != "wif"})
         print("Issue Asset", order["edicts"], broker(order), "\n\n")
 

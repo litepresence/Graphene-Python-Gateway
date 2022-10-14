@@ -52,11 +52,13 @@ def test_transfer(network):
     """
     print("\033c")
     balances(network)
-    order = {}
-    order["to"] = GATE[network][1]["public"]  # pass the reciever PUBLIC key
-    order["quantity"] = 0.1
-    order["public"] = GATE[network][0]["public"]  # pass the sender PUBLIC key
-    order["private"] = GATE[network][0]["private"]  # pass the sender PRIVATE key
+    order = {
+        "to": GATE[network][1]["public"],
+        "quantity": 0.1,
+        "public": GATE[network][0]["public"],
+        "private": GATE[network][0]["private"],
+    }
+
     print(order)
     if network == "xrp":
         print(xrp_transfer(order))
@@ -72,11 +74,13 @@ def refill_test_account(network):
     """
     print("\033c")
     balances(network)
-    order = {}
-    order["to"] = TEST[network]["public"]  # pass the reciever PUBLIC key
-    order["quantity"] = 2
-    order["public"] = GATE[network][0]["public"]  # pass the sender PUBLIC key
-    order["private"] = GATE[network][0]["private"]  # pass the sender PRIVATE key
+    order = {
+        "to": TEST[network]["public"],
+        "quantity": 2,
+        "public": GATE[network][0]["public"],
+        "private": GATE[network][0]["private"],
+    }
+
     print({k: v for k, v in order.items() if k != "private"})
     if network == "xrp":
         print(xrp_transfer(order))

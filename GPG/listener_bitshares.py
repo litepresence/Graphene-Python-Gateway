@@ -24,6 +24,7 @@ includes on_op definition for gateway withdrawal use upon issuer receipt of uia
 may also run independently as a block ops listener for any Operation ID
 """
 
+
 # DISABLE SELECT PYLINT TESTS
 # pylint: disable=too-many-branches, too-many-nested-blocks, too-many-locals
 # pylint: disable=broad-except, invalid-name, bad-continuation
@@ -55,7 +56,7 @@ BLOCK_MAVENS = min(5, len(bitshares_nodes()))
 BLOCK_NUM_MAVENS = min(5, len(bitshares_nodes()))
 BEGIN = int(time.time())
 GATE = configure()["gate"]
-PATH = str(os.path.dirname(os.path.abspath(__file__))) + "/"
+PATH = f"{str(os.path.dirname(os.path.abspath(__file__)))}/"
 
 
 def create_database():
@@ -63,10 +64,10 @@ def create_database():
     initialize an empty text pipe IPC json_ipc
     :return None:
     """
-    os.makedirs(PATH + "pipe", exist_ok=True)
+    os.makedirs(f"{PATH}pipe", exist_ok=True)
     for maven_id in range(BLOCK_NUM_MAVENS):
         json_ipc(doc=f"block_num_maven_{maven_id}.txt", text=json_dumps([0,]))
-    json_ipc(doc=f"block_number.txt", text=json_dumps([0,]))
+    json_ipc(doc="block_number.txt", text=json_dumps([0,]))
 
 
 def print_options(options):
@@ -77,7 +78,7 @@ def print_options(options):
     print(it("yellow", "\n\n                         Operation ID Numbers\n"))
     msg = ""
     for idx in range(30):
-        msg += "    " + str(idx).ljust(4) + str(options[idx]).ljust(30)
+        msg += f"    {str(idx).ljust(4)}{str(options[idx]).ljust(30)}"
         try:
             msg += str(idx + 30).ljust(4) + str(options[idx + 30])
         except Exception:
@@ -136,7 +137,7 @@ def choice():
             + "\n        operation(s) selected:    \n",
         )
     )
-    print(it("blue", "        " + str(selection) + "\n"))
+    print(it("blue", f"        {selection}" + "\n"))
     for k in selection:
         print("       ", (operations[k]))
     print(it("green", "\n\n        fetching latest irreversible block number...\n"))
@@ -151,10 +152,10 @@ def spawn_block_num_processes():
     :return None:
     """
     for maven_id in range(BLOCK_NUM_MAVENS):
-        block_num_processes = {}
-        block_num_processes[maven_id] = Process(
-            target=block_num_maven, args=(maven_id,)
-        )
+        block_num_processes = {
+            maven_id: Process(target=block_num_maven, args=(maven_id,))
+        }
+
         block_num_processes[maven_id].start()
 
 
@@ -195,9 +196,7 @@ def block_maven(maven_id, start, stop):
     """
     rpc = wss_handshake("")
     # dictionary that will contain a list of transactions on each block
-    blocks = {}
-    for block_num in range(start, stop):
-        blocks[block_num] = []
+    blocks = {block_num: [] for block_num in range(start, stop)}
     json_ipc(doc=f"block_maven_{maven_id}.txt", text=json_dumps(blocks))
     for block_num in range(start, stop):
         while True:
@@ -223,16 +222,14 @@ def rpc_account_id(rpc, account_name):
     :return str(account_id): a.b.c format
     """
     ret = wss_query(rpc, ["database", "lookup_accounts", [account_name, 1]])
-    account_id = ret[0][1]
-    return account_id
+    return ret[0][1]
 
 
 def rpc_get_objects(rpc, object_id):
     """
     Return data about objects in 1.7.x, 2.4.x, 1.3.x, etc. format
     """
-    ret = wss_query(rpc, ["database", "get_objects", [object_id,]])
-    return ret
+    return wss_query(rpc, ["database", "get_objects", [object_id,]])
 
 
 def rpc_balances(rpc, account_name, asset_id):
@@ -241,10 +238,14 @@ def rpc_balances(rpc, account_name, asset_id):
     NOTE amounts returned are graphene integers lacking precision
     return int(graphene_amount)
     """
-    balance = wss_query(
-        rpc, ["database", "get_named_account_balances", [account_name, [asset_id]],]
+    return wss_query(
+        rpc,
+        [
+            "database",
+            "get_named_account_balances",
+            [account_name, [asset_id]],
+        ],
     )[0]
-    return balance
 
 
 def spawn_block_processes(start, stop):
@@ -298,21 +299,20 @@ def withdraw(op):
     """
     # if its a transfer to gateway with a memo
     tgm = False
-    if op[0] == 0:  # transfer
-        if op[1]["to"] in [
-            GATE["uia"]["eos"]["issuer_id"],
-            GATE["uia"]["xrp"]["issuer_id"],
-        ]:
-            print(it("yellow", "gate uia transfer"))
-            if "memo" in op[1].keys():
-                print(
-                    it("red", "TRANSFER TO GATEWAY WITH MEMO\n\n"),
-                    it("yellow", op),
-                    "\n",
-                )
-                tgm = True
-            else:
-                print(it("red", "WARN: transfer to gateway WITHOUT memo"))
+    if op[0] == 0 and op[1]["to"] in [
+        GATE["uia"]["eos"]["issuer_id"],
+        GATE["uia"]["xrp"]["issuer_id"],
+    ]:
+        print(it("yellow", "gate uia transfer"))
+        if "memo" in op[1].keys():
+            print(
+                it("red", "TRANSFER TO GATEWAY WITH MEMO\n\n"),
+                it("yellow", op),
+                "\n",
+            )
+            tgm = True
+        else:
+            print(it("red", "WARN: transfer to gateway WITHOUT memo"))
     if tgm:
         timestamp()
         line_number()
@@ -405,7 +405,7 @@ def listener_bitshares(selection=None):
             # NOTE: may throw StatisticsError when no mode
             curr_block_num = mode(block_numbers)
             # print(curr_block_num)
-            json_ipc(doc=f"block_number.txt", text=json_dumps([curr_block_num,]))
+            json_ipc(doc="block_number.txt", text=json_dumps([curr_block_num,]))
             # if the irreverisble block number has advanced
             if curr_block_num > last_block_num:
                 print(
@@ -421,9 +421,7 @@ def listener_bitshares(selection=None):
                     stop = curr_block_num + 1
                     spawn_block_processes(start, stop)
                     # inititialize blocks as a dict of empty transaction lists
-                    blocks = {}
-                    for block_num in range(start, stop):
-                        blocks[block_num] = []
+                    blocks = {block_num: [] for block_num in range(start, stop)}
                     # get block transactions from each maven subprocesses
                     for maven_id in range(BLOCK_MAVENS):
                         # print(maven_id)
@@ -455,10 +453,8 @@ def listener_bitshares(selection=None):
                                 process.start()
                 last_block_num = curr_block_num
             time.sleep(6)
-        # statistics and key errors can be safely ignored, restart loop
         except (StatisticsError, KeyError):
             continue
-        # in all other cases provide stack trace
         except Exception as error:
             print("\n\n", it("yellow", error), "\n\n")
             print(traceback.format_exc(), "\n")

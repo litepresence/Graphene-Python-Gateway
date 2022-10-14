@@ -40,10 +40,8 @@ def initialize_addresses(chain):
     create the IPC file with a list of ones ie [1,1,1,...]
     the addresses are "all available" on startup.
     """
-    initial_state = []
     doc = f"{chain}_gateway_state.txt"
-    for _ in GATE[chain]:
-        initial_state.append(1)
+    initial_state = [1 for _ in GATE[chain]]
     json_ipc(doc=doc, text=json_dumps(initial_state))
 
 
@@ -96,25 +94,25 @@ def unit_test_gateway_state():
     print("\033c")
     print("\n\nunit test gateway deposit address state machine\n\n")
     initialize_addresses("xrp")
-    print(json_ipc(f"xrp_gateway_state.txt"))
+    print(json_ipc("xrp_gateway_state.txt"))
     print("\n\nlocking an xrp address\n")
     address_idx = lock_address("xrp")
     print("address index", address_idx)
-    print(json_ipc(f"xrp_gateway_state.txt"))
+    print(json_ipc("xrp_gateway_state.txt"))
     print("\n\nlocking another xrp address\n")
     address_idx = lock_address("xrp")
     print("address index", address_idx)
-    print(json_ipc(f"xrp_gateway_state.txt"))
+    print(json_ipc("xrp_gateway_state.txt"))
     print("\n\nlaunching subprocess unlocking xrp address 0 immediately\n\nAND")
     print("\nlaunching second subprocess unlocking xrp address 1 after 10 seconds\n")
     time.sleep(0.1)
     unlock_address("xrp", 0, 0)
     time.sleep(0.1)
     unlock_address("xrp", 1, 10)
-    print(json_ipc(f"xrp_gateway_state.txt"))
+    print(json_ipc("xrp_gateway_state.txt"))
     print("\n\nprimary process waiting 10 seconds\n")
     time.sleep(11)
-    print(json_ipc(f"xrp_gateway_state.txt"))
+    print(json_ipc("xrp_gateway_state.txt"))
 
 
 if __name__ == "__main__":

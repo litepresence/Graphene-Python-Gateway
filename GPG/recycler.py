@@ -78,14 +78,15 @@ def gateway_balances(network=None):
     if network in ["xrp", None]:
         for gate in GATE["xrp"]:
             print(
-                f"Gateway XRP balance for",
+                "Gateway XRP balance for",
                 gate["public"].rjust(40),
                 xrp_balance(gate["public"]),
             )
+
     if network in ["eos", None]:
         for gate in GATE["eos"]:
             print(
-                f"Gateway EOS balance for",
+                "Gateway EOS balance for",
                 gate["public"].rjust(40),
                 eos_balance(gate["public"]),
             )

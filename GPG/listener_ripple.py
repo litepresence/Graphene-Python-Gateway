@@ -97,10 +97,7 @@ def verify_ripple_account(account):
     timestamp()
     line_number()
     print(ret, "\n")
-    is_account = False
-    if "account_data" in ret.keys():
-        is_account = True
-    return is_account
+    return "account_data" in ret.keys()
 
 
 def listener_ripple(

@@ -59,7 +59,7 @@ def eos_balance(account):
         node = nodes[0]
         mavens = mavens[-len(nodes) :]
         try:
-            url = node + "/v1/chain/get_currency_balance"
+            url = f"{node}/v1/chain/get_currency_balance"
             data = json_dumps(params)
             ret = post(url, data=data, timeout=2).json()
             balance_data = json_dumps(ret)
@@ -131,11 +131,13 @@ def unit_test_eos_transfer():
     UNIT TEST demo transfer
     """
     try:
-        order = {}
-        order["private"] = TEST["eos"]["private"]
-        order["public"] = TEST["eos"]["public"]
-        order["to"] = GATE["eos"][1]["public"]
-        order["quantity"] = 0.0001
+        order = {
+            "private": TEST["eos"]["private"],
+            "public": TEST["eos"]["public"],
+            "to": GATE["eos"][1]["public"],
+            "quantity": 0.0001,
+        }
+
         # serialize, sign, and broadcast
         eos_transfer(order)
     except Exception:

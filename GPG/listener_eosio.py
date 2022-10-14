@@ -67,7 +67,7 @@ def get_irreversible_block():
     """
     no frills get current block number
     """
-    url = NODE + "/v1/chain/get_info"
+    url = f"{NODE}/v1/chain/get_info"
     ret = post(url, timeout=POST_TIMEOUT).json()
     return ret["last_irreversible_block_num"]
 
@@ -76,7 +76,7 @@ def get_block(block_num, blocks_pipe):
     """
     return the block data via multiprocessing Value pipe
     """
-    url = NODE + "/v1/chain/get_block"
+    url = f"{NODE}/v1/chain/get_block"
     data = json_dumps({"block_num_or_id": str(block_num)})
     ret = post(url, data=data, timeout=POST_TIMEOUT).json()
     blocks_pipe[block_num].value = ret
@@ -87,14 +87,11 @@ def verify_eosio_account(account_name):
     eosio public api consensus of get_account() returns True or False on existance
     :param str(account_name): eosio 12 character account name
     """
-    url = NODE + "/v1/chain/get_account"
+    url = f"{NODE}/v1/chain/get_account"
     params = {"account_name": str(account_name)}
     data = json_dumps(params)
     ret = post(url, data=data, timeout=POST_TIMEOUT).json()
-    is_account = False
-    if "created" in ret.keys():
-        is_account = True
-    return is_account
+    return "created" in ret.keys()
 
 
 def listener_eosio(
@@ -156,10 +153,7 @@ def listener_eosio(
             for block_num in new_blocks:
                 block_processes[block_num].join()
             # extract the blocks from each "Value" in blocks_pipe
-            blocks = {}
-            for block_num, block in blocks_pipe.items():
-                # create block number keyed dict of block data dicts
-                blocks[block_num] = block.value
+            blocks = {block_num: block.value for block_num, block in blocks_pipe.items()}
             # with new cache of blocks, check every block from last check till now
             for block_num in new_blocks:
                 print(
@@ -195,8 +189,6 @@ def listener_eosio(
                             ):
                                 # extract transfer op data
                                 qty = action["data"]["quantity"]
-                                trx_to = action["data"]["to"]
-                                trx_from = action["data"]["from"]
                                 trx_asset = qty.split(" ")[1].upper()
                                 trx_amount = float(qty.split(" ")[0])
                                 # sort again by > nil amount of eos
@@ -205,6 +197,8 @@ def listener_eosio(
                                     # if issuer_action is None:
                                     if DEV:
                                         print(f"nonce {nonce}", block_num, action, "\n")
+                                    trx_to = action["data"]["to"]
+                                    trx_from = action["data"]["from"]
                                     # if there are any transfers listed
                                     if gateway in [trx_from, trx_to]:
                                         timestamp()
