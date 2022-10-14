@@ -47,11 +47,11 @@ import time
 from requests import post
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from nodes import eosio_nodes
-from config import configure
-from signing_bitshares import issue, reserve
-from gateway_state import unlock_address
-from utilities import it, timestamp, line_number
+from GPG.nodes import eosio_nodes
+from GPG.config import configure
+from GPG.signing_bitshares import issue, reserve
+from GPG.gateway_state import unlock_address
+from GPG.utilities import it, timestamp, line_number
 
 # GLOBAL CONSTANTS
 GATE = configure()["gate"]

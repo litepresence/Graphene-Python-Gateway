@@ -38,11 +38,11 @@ import time
 from multiprocessing import Process
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from deposit_server import api_server
-from gateway_state import initialize_addresses
-from listener_bitshares import listener_bitshares
-from recycler import recycler
-from utilities import json_ipc, logo, it
+from GPG.deposit_server import api_server
+from GPG.gateway_state import initialize_addresses
+from GPG.listener_bitshares import listener_bitshares
+from GPG.recycler import recycler
+from GPG.utilities import json_ipc, logo, it
 
 
 def withdraw_listener_bitshares():

@@ -35,21 +35,37 @@ Currently gateway tokenization of the following coins are supported:
 - EOSIO - EOS
 - Ripple - XRP
 
-# This project has been sponsored by www.bitshares.org 
+### This project has been sponsored by www.bitshares.org 
 
 and peer reviewed by BitShares core developer Dr. Christopher Sanborn
 
+---
 
-    NON STANDARD MODULES WHICH REQUIRE INSTALLATION
+### Installation
+1. Clone repository
+```bash
+git clone https://github.com/litepresence/Graphene-Python-Gateway
+```
+2. cd to repository
+```bash
+cd Graphene-Python-Gateway
+```
+3. Create and activate virtual environment
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+4. Install Graphene Python Gateway in editable mode
+```bash
+pip install -e .
+```
 
-- falcon 
-- pybitshares 
-- eosiopy 
-- requests
-- websocket-client
-- secp256k1
-- ecdsa
-- aioxrpy
+---
+
+### Deploying
+Read deploy_manual.txt
+
+---
 
 Be advised, although this gateway has been live tested on chain and peer reviewed, 
 it should be considered beta software and has not yet been deployed live to the public.

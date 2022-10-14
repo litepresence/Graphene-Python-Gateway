@@ -121,7 +121,7 @@ def unit_test_nodes():
     print the list of nodes in use by the Gateway
     """
     print("bitshares nodes\n", bitshares_nodes(), "\n\n")
-    print("bitshares nodes\n", eosio_nodes(), "\n\n")
+    print("eos nodes\n", eosio_nodes(), "\n\n")
 
 
 if __name__ == "__main__":

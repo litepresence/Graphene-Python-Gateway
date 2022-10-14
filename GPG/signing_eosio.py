@@ -36,9 +36,9 @@ from eosiopy.rawinputparams import RawinputParams
 from eosiopy import eosio_config
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from nodes import eosio_nodes
-from utilities import it, precisely, timestamp, line_number
-from config import configure
+from GPG.nodes import eosio_nodes
+from GPG.utilities import it, precisely, timestamp, line_number
+from GPG.config import configure
 
 # CONSTANTS
 KEYS = configure()

@@ -39,15 +39,15 @@ from json import loads as json_loads
 from statistics import mode, StatisticsError
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from utilities import json_ipc, from_iso_date, it, raw_operations, timestamp
-from utilities import wss_handshake, wss_query, block_ops_logo, line_number
-from listener_eosio import listener_eosio, verify_eosio_account
-from listener_ripple import listener_ripple, verify_ripple_account
-from nodes import bitshares_nodes, eosio_nodes
-from signing_eosio import eos_transfer
-from signing_ripple import xrp_transfer
-from decoder_ring import ovaltine
-from config import configure
+from GPG.utilities import json_ipc, from_iso_date, it, raw_operations, timestamp
+from GPG.utilities import wss_handshake, wss_query, block_ops_logo, line_number
+from GPG.listener_eosio import listener_eosio, verify_eosio_account
+from GPG.listener_ripple import listener_ripple, verify_ripple_account
+from GPG.nodes import bitshares_nodes, eosio_nodes
+from GPG.signing_eosio import eos_transfer
+from GPG.signing_ripple import xrp_transfer
+from GPG.decoder_ring import ovaltine
+from GPG.config import configure
 
 
 # CONSTANTS

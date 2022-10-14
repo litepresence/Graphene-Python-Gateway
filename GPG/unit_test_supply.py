@@ -18,9 +18,9 @@ BitShares UIA Dynamic Supply
 """
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from listener_bitshares import rpc_get_objects
-from utilities import wss_handshake
-from config import configure
+from GPG.listener_bitshares import rpc_get_objects
+from GPG.utilities import wss_handshake
+from GPG.config import configure
 
 # GLOBAL CONSTANTS
 GATE = configure()["gate"]

@@ -22,7 +22,7 @@ from graphenebase import PrivateKey, PublicKey
 from graphenebase.memo import decode_memo
 
 # GRAPHENE PYTHON GATEWAY MODULES
-from config import configure
+from GPG.config import configure
 
 
 # GLOBAL CONSTANTS
