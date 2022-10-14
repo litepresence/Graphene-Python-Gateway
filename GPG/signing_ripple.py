@@ -120,11 +120,12 @@ def unit_test_xrp_transfer():
     xrp_balance(TEST["xrp"]["public"])
     xrp_balance(GATE["xrp"][1]["public"])
 
-    order = {}
-    order["public"] = TEST["xrp"]["public"]
-    order["private"] = TEST["xrp"]["private"]
-    order["to"] = GATE["xrp"][1]["public"]
-    order["quantity"] = 10
+    order = {
+        "public": TEST["xrp"]["public"],
+        "private": TEST["xrp"]["private"],
+        "to": GATE["xrp"][1]["public"],
+        "quantity": 10,
+    }
 
     print(xrp_transfer(order), "\n")
     time.sleep(5)

@@ -140,7 +140,7 @@ def test_deposit(network, get_balance):
         "client_id": client_id,  # bitshares account id 1.2.X
         "uia_name": uia_name,
     }
-    print(SERVER_URL + f"?client_id={client_id}&uia_name={uia_name}")
+    print(f"{SERVER_URL}?client_id={client_id}&uia_name={uia_name}")
     input("\npress Enter to make request for gateway deposit address\n")
     data = get(url=SERVER_URL, params=params).json()
     print("Server Response:")
@@ -149,11 +149,13 @@ def test_deposit(network, get_balance):
     time.sleep(10)
     print()
     # auto deposit foreign chain to gateway
-    order = {}
-    order["quantity"] = 1
-    order["to"] = data["deposit_address"]
-    order["public"] = TEST[network]["public"]  # pass the sender PUBLIC key
-    order["private"] = TEST[network]["private"]  # pass the sender PRIVATE key
+    order = {
+        "quantity": 1,
+        "to": data["deposit_address"],
+        "public": TEST[network]["public"],
+        "private": TEST[network]["private"],
+    }
+
     if network == "xrp":
         print(xrp_transfer(order))
     elif network == "eos":
@@ -209,11 +211,13 @@ def test_recycler(network, get_balance, do_transfer):
     """
     gate_balances(network, get_balance)
     # deposit to gateway
-    order = {}
-    order["public"] = GATE[network][0]["public"]  # pass the sender PUBLIC key
-    order["private"] = GATE[network][0]["private"]  # pass the sender PRIVATE key
-    order["to"] = GATE[network][1]["public"]
-    order["quantity"] = 1
+    order = {
+        "public": GATE[network][0]["public"],
+        "private": GATE[network][0]["private"],
+        "to": GATE[network][1]["public"],
+        "quantity": 1,
+    }
+
     do_transfer(order)
     gate_balances(network, get_balance)
     print("\n\nwaiting 1 minute for recycler to move funds")
